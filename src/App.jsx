@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import "./App.css";
 import { useEffect } from "react";
 import api from "../api";
@@ -7,7 +7,10 @@ function App() {
   const [pokemon, setPokemon] = useState("");
   const [inputNamePokemon, setInputNamePokemon] = useState("");
   const [contadorErrado, setContadorErrado] = useState(0);
-  const input = document.getElementById("name_field");
+  const [contadorAcierto, setContadorAcierto] = useState(0);
+  const [acierto, setAcierto] = useState(false);
+  const inputRef = useRef(null);
+  const modalRef = useRef(null);
   const { name } = pokemon;
 
   async function obtenerPokemonAleatorio() {
@@ -21,28 +24,42 @@ function App() {
   }
 
   useEffect(() => {
-    if (pokemon && inputNamePokemon) {
-      const namePok = inputNamePokemon.toLowerCase().replace(/\s+/g, "");
-
-      if (namePok !== name) {
-        namePok.length > name.length / 2 ? (input.className = "nes-input is-error") : (input.className = "nes-input");
-      }
-      if (namePok === name) {
-        input.className = "nes-input is-success";
-      }
-    }
-  }, [inputNamePokemon, pokemon]);
-
-  useEffect(() => {
     obtenerPokemonAleatorio();
   }, []);
 
   const verificarRespuesta = () => {
+    const element = modalRef.current;
     if (inputNamePokemon === name) {
-      console.log("Acertaste cracke");
+      inputRef.current.className = "nes-input is-success";
+      element.querySelector("p").textContent = "Correcto";
+      element.querySelector("button").textContent = "Seguir jugando";
+      element.querySelector("button").className = "nes-btn is-success";
+      setAcierto(true);
+      setContadorAcierto(contadorAcierto + 1);
     } else {
+      inputRef.current.className = "nes-input is-error";
+      element.querySelector("p").textContent = "Incorrecto";
+      element.querySelector("button").textContent = "Volver a intentar";
+      element.querySelector("button").className = "nes-btn is-error";
+      setAcierto(false);
       setContadorErrado(contadorErrado + 1);
-      console.log(contadorErrado);
+    }
+    element.showModal();
+  };
+
+  const apretarTecla = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      verificarRespuesta();
+    }
+  };
+
+  const cambiarPokemon = () => {
+    if (acierto) {
+      obtenerPokemonAleatorio();
+      inputRef.value = "";
+      inputRef.className = "nes-input";
+      setInputNamePokemon("");
     }
   };
 
@@ -56,33 +73,45 @@ function App() {
           <img src={pokemon.image} alt="" />
         </div>
       </section>
-      <div className="nes-field">
+      <div className="nes-field" id="field">
         <label htmlFor="name_field"></label>
         <input
           type="text"
           id="name_field"
+          ref={inputRef}
           className="nes-input"
-          onChange={(data) => setInputNamePokemon(data.target.value)}
+          placeholder="Ingresa el nombre del Pókemon"
+          onKeyDown={apretarTecla}
+          onChange={(data) => {
+            setInputNamePokemon(data.target.value.toLocaleLowerCase().replace(/\s+/g, ""));
+            inputRef.current.className = "nes-input";
+          }}
         />
-        <button type="button" className="nes-btn is-primary" onClick={() => verificarRespuesta()}>
-          Adivinar
-        </button>
+      </div>
+      <section>
         <button
           type="button"
           className="nes-btn is-primary"
           onClick={() => {
-            obtenerPokemonAleatorio();
-            input.value = "";
-            input.className = "nes-input";
-            setInputNamePokemon("");
+            verificarRespuesta();
           }}
         >
-          Reiniciar
+          Adivinar
         </button>
-      </div>
-      <div className="nes-container with-title is-centered">
-        <p className="title">Contador de intentos fallidos</p>
-        <p>Has fallado la gran cantidad de {contadorErrado} veces al Pokémon</p>
+        <dialog className="nes-dialog" id="dialog-default" ref={modalRef}>
+          <form method="dialog">
+            <p></p>
+            <menu className="dialog-menu">
+              <button className="nes-btn" onClick={cambiarPokemon}></button>
+            </menu>
+          </form>
+        </dialog>
+      </section>
+      <div className="nes-container is-centered">
+        <h2 className="aciertos">Aciertos: {contadorAcierto}</h2>
+        <progress className="nes-progress is-success" value={contadorAcierto} max="10"></progress>
+        <h2 className="fallos">Fallos: {contadorErrado}</h2>
+        <progress className="nes-progress is-error" value={contadorErrado} max="10"></progress>
       </div>
     </>
   );
