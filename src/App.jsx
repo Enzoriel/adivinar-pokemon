@@ -57,8 +57,8 @@ function App() {
   const cambiarPokemon = () => {
     if (acierto) {
       obtenerPokemonAleatorio();
-      inputRef.value = "";
-      inputRef.className = "nes-input";
+      inputRef.current.value = "";
+      inputRef.current.className = "nes-input";
       setInputNamePokemon("");
     }
   };
@@ -102,7 +102,7 @@ function App() {
           <form method="dialog">
             <p></p>
             <menu className="dialog-menu">
-              <button className="nes-btn" onClick={cambiarPokemon}></button>
+              <button className="nes-btn" onClick={cambiarPokemon} onKeyDown={cambiarPokemon}></button>
             </menu>
           </form>
         </dialog>
