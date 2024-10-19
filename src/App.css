@@ -2,4 +2,37 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.caja {
+  display: flex;
+  justify-content: center;
+}
+
+.contenedor-pokemon {
+  width: 400px;
+  height: 400px;
+}
+
+.img-pokemon-silueta {
+  width: 400px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: grayscale(100%);
+  filter: brightness(0);
+  object-fit: cover;
+}
+
+.img-pokemon {
+  width: 500px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.nes-container {
+  width: 80%;
 }

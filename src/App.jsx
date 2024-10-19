@@ -9,8 +9,10 @@ function App() {
   const [contadorErrado, setContadorErrado] = useState(0);
   const [contadorAcierto, setContadorAcierto] = useState(0);
   const [acierto, setAcierto] = useState(false);
+  const [estadoJuego, setEstadoJuego] = useState(true);
   const inputRef = useRef(null);
   const modalRef = useRef(null);
+  const imgPokeRef = useRef(null);
   const { name } = pokemon;
 
   async function obtenerPokemonAleatorio() {
@@ -24,6 +26,12 @@ function App() {
   }
 
   useEffect(() => {
+    estadoJuego
+      ? (imgPokeRef.current.className = "img-pokemon-silueta")
+      : (imgPokeRef.current.className = "img-pokemon");
+  }, [estadoJuego]);
+
+  useEffect(() => {
     obtenerPokemonAleatorio();
   }, []);
 
@@ -34,6 +42,7 @@ function App() {
       element.querySelector("p").textContent = "Correcto";
       element.querySelector("button").textContent = "Seguir jugando";
       element.querySelector("button").className = "nes-btn is-success";
+      setEstadoJuego(false);
       setAcierto(true);
       setContadorAcierto(contadorAcierto + 1);
     } else {
@@ -56,6 +65,7 @@ function App() {
 
   const cambiarPokemon = () => {
     if (acierto) {
+      setEstadoJuego(true);
       obtenerPokemonAleatorio();
       inputRef.current.value = "";
       inputRef.current.className = "nes-input";
@@ -68,9 +78,9 @@ function App() {
       <div>
         <h1 className="nes-text is-primary">¿Quién es este Pokémon?</h1>
       </div>
-      <section>
-        <div>
-          <img src={pokemon.image} alt="" />
+      <section className="caja">
+        <div className="contenedor-pokemon">
+          <img ref={imgPokeRef} className="img-pokemon-silueta" src={pokemon.image} alt="" />
         </div>
       </section>
       <div className="nes-field" id="field">
