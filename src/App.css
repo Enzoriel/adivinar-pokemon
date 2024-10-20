@@ -4,11 +4,10 @@
   text-align: center;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 }
 
-.caja {
+.caja-pokemon {
   display: flex;
   justify-content: center;
 }
@@ -21,18 +20,28 @@
 .img-pokemon-silueta {
   width: 400px;
   image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  filter: grayscale(100%);
   filter: brightness(0);
   object-fit: cover;
 }
 
 .img-pokemon {
-  width: 500px;
+  width: 400px;
   image-rendering: pixelated;
-  image-rendering: crisp-edges;
 }
 
 .nes-container {
   width: 80%;
+}
+
+.caja-input {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.nes-field {
+  width: 50%;
+  margin-right: 20px;
 }

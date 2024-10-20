@@ -1,6 +1,5 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import "./App.css";
-import { useEffect } from "react";
 import api from "../api";
 
 function App() {
@@ -13,109 +12,109 @@ function App() {
   const inputRef = useRef(null);
   const modalRef = useRef(null);
   const imgPokeRef = useRef(null);
+  const buttonAdivinar = useRef(null);
   const { name } = pokemon;
 
-  async function obtenerPokemonAleatorio() {
+  const obtenerPokemonAleatorio = useCallback(async () => {
     try {
       const pokemonAleatorio = await api.random();
       setPokemon(pokemonAleatorio);
-      console.log(pokemonAleatorio.name);
     } catch (error) {
       console.error("Error al obtener el Pokémon:", error);
     }
-  }
-
-  useEffect(() => {
-    estadoJuego
-      ? (imgPokeRef.current.className = "img-pokemon-silueta")
-      : (imgPokeRef.current.className = "img-pokemon");
-  }, [estadoJuego]);
+  }, []);
 
   useEffect(() => {
     obtenerPokemonAleatorio();
-  }, []);
+  }, [obtenerPokemonAleatorio]);
 
-  const verificarRespuesta = () => {
-    const element = modalRef.current;
+  useEffect(() => {
+    if (imgPokeRef.current) {
+      imgPokeRef.current.className = estadoJuego ? "img-pokemon-silueta" : "img-pokemon";
+    }
+  }, [estadoJuego]);
+
+  const verificarRespuesta = useCallback(() => {
     if (inputNamePokemon === name) {
-      inputRef.current.className = "nes-input is-success";
-      element.querySelector("p").textContent = "Correcto";
-      element.querySelector("button").textContent = "Seguir jugando";
-      element.querySelector("button").className = "nes-btn is-success";
       setEstadoJuego(false);
       setAcierto(true);
-      setContadorAcierto(contadorAcierto + 1);
+      setContadorAcierto((prev) => prev + 1);
     } else {
-      inputRef.current.className = "nes-input is-error";
-      element.querySelector("p").textContent = "Incorrecto";
-      element.querySelector("button").textContent = "Volver a intentar";
-      element.querySelector("button").className = "nes-btn is-error";
       setAcierto(false);
-      setContadorErrado(contadorErrado + 1);
+      setContadorErrado((prev) => prev + 1);
     }
-    element.showModal();
-  };
-
-  const apretarTecla = (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      verificarRespuesta();
+    if (inputRef.current) {
+      inputRef.current.className = `nes-input ${inputNamePokemon === name ? "is-success" : "is-error"}`;
     }
-  };
+  }, [inputNamePokemon, name]);
 
-  const cambiarPokemon = () => {
+  const apretarTecla = useCallback(
+    (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        estadoJuego ? verificarRespuesta() : cambiarPokemon();
+      }
+    },
+    [estadoJuego, verificarRespuesta]
+  );
+
+  const cambiarPokemon = useCallback(() => {
     if (acierto) {
       setEstadoJuego(true);
       obtenerPokemonAleatorio();
-      inputRef.current.value = "";
-      inputRef.current.className = "nes-input";
+      if (inputRef.current) {
+        inputRef.current.value = "";
+        inputRef.current.className = "nes-input";
+      }
       setInputNamePokemon("");
     }
-  };
+  }, [acierto, obtenerPokemonAleatorio]);
 
   return (
     <>
       <div>
         <h1 className="nes-text is-primary">¿Quién es este Pokémon?</h1>
       </div>
-      <section className="caja">
+      <section className="caja-pokemon">
         <div className="contenedor-pokemon">
           <img ref={imgPokeRef} className="img-pokemon-silueta" src={pokemon.image} alt="" />
         </div>
       </section>
-      <div className="nes-field" id="field">
-        <label htmlFor="name_field"></label>
-        <input
-          type="text"
-          id="name_field"
-          ref={inputRef}
-          className="nes-input"
-          placeholder="Ingresa el nombre del Pókemon"
-          onKeyDown={apretarTecla}
-          onChange={(data) => {
-            setInputNamePokemon(data.target.value.toLocaleLowerCase().replace(/\s+/g, ""));
-            inputRef.current.className = "nes-input";
-          }}
-        />
-      </div>
-      <section>
-        <button
-          type="button"
-          className="nes-btn is-primary"
-          onClick={() => {
-            verificarRespuesta();
-          }}
-        >
-          Adivinar
-        </button>
-        <dialog className="nes-dialog" id="dialog-default" ref={modalRef}>
-          <form method="dialog">
-            <p></p>
-            <menu className="dialog-menu">
-              <button className="nes-btn" onClick={cambiarPokemon} onKeyDown={cambiarPokemon}></button>
-            </menu>
-          </form>
-        </dialog>
+      <section className="caja-input">
+        <div className="nes-field" id="field">
+          <label htmlFor="name_field"></label>
+          <input
+            type="text"
+            id="name_field"
+            ref={inputRef}
+            className="nes-input"
+            placeholder="Ingresa el nombre del Pókemon"
+            onKeyDown={apretarTecla}
+            onChange={(data) => {
+              setInputNamePokemon(data.target.value.toLocaleLowerCase().replace(/\s+/g, ""));
+              inputRef.current.className = "nes-input";
+            }}
+          />
+        </div>
+        <div ref={buttonAdivinar}>
+          <button
+            type="button"
+            className={estadoJuego ? "nes-btn is-primary" : "nes-btn is-success"}
+            onClick={() => {
+              estadoJuego ? verificarRespuesta() : cambiarPokemon();
+            }}
+          >
+            {estadoJuego ? "Adivinar" : "Continuar"}
+          </button>
+          <dialog className="nes-dialog" id="dialog-default" ref={modalRef}>
+            <form method="dialog">
+              <p></p>
+              <menu className="dialog-menu">
+                <button className="nes-btn" onClick={cambiarPokemon}></button>
+              </menu>
+            </form>
+          </dialog>
+        </div>
       </section>
       <div className="nes-container is-centered">
         <h2 className="aciertos">Aciertos: {contadorAcierto}</h2>
