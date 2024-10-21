@@ -10,10 +10,16 @@ function App() {
   const [acierto, setAcierto] = useState(false);
   const [estadoJuego, setEstadoJuego] = useState(true);
   const [juegoTerminado, setJuegoTerminado] = useState(false);
+  const [UIGlobal, setUIGlobal] = useState(false);
+  const [contadorErradoGlobal, setContadorErradoGlobal] = useState(() => {
+    const savedCount = localStorage.getItem("contadorErradoGlobal");
+    return savedCount ? parseInt(savedCount, 10) : 0;
+  });
   const inputRef = useRef(null);
   const modalRef = useRef(null);
   const imgPokeRef = useRef(null);
   const buttonAdivinar = useRef(null);
+  const options = useRef(null);
   const { name } = pokemon;
 
   const obtenerPokemonAleatorio = useCallback(async () => {
@@ -27,15 +33,9 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (contadorAcierto >= 10) {
-      console.log("Has ganau");
+    if (juegoTerminado) {
+      modalRef.current.showModal();
     }
-    if (contadorErrado >= 10) {
-      console.log("has perdio");
-    }
-    setJuegoTerminado(false);
-    setContadorAcierto(0);
-    setContadorErrado(0);
   }, [juegoTerminado]);
 
   useEffect(() => {
@@ -55,6 +55,11 @@ function App() {
       setAcierto(true);
     } else {
       setContadorErrado((prev) => prev + 1);
+      setContadorErradoGlobal((prev) => {
+        const newCount = prev + 1;
+        localStorage.setItem("contadorErradoGlobal", newCount.toString());
+        return newCount;
+      });
       setAcierto(false);
     }
     if (inputRef.current) {
@@ -126,9 +131,23 @@ function App() {
           </button>
           <dialog className="nes-dialog" id="dialog-default" ref={modalRef}>
             <form method="dialog">
-              <p></p>
+              <p>
+                {contadorAcierto >= 10 && "¡Has ganado!"}
+                {contadorErrado >= 10 && "¡Has perdido!"}
+              </p>
               <menu className="dialog-menu">
-                <button className="nes-btn" onClick={cambiarPokemon}></button>
+                <button
+                  className="nes-btn"
+                  onClick={() => {
+                    setJuegoTerminado(false);
+                    setContadorAcierto(0);
+                    setContadorErrado(0);
+                    obtenerPokemonAleatorio();
+                  }}
+                >
+                  {contadorAcierto >= 10 && "Volver a jugar"}
+                  {contadorErrado >= 10 && "Volver a intentarlo"}
+                </button>
               </menu>
             </form>
           </dialog>
@@ -140,6 +159,24 @@ function App() {
         <h2 className="fallos">Fallos: {contadorErrado}</h2>
         <progress className="nes-progress is-error" value={contadorErrado} max="10"></progress>
       </div>
+      <label>
+        <input
+          type="checkbox"
+          className="nes-checkbox"
+          checked={UIGlobal}
+          onChange={(e) => {
+            setUIGlobal(e.target.checked);
+          }}
+        />
+        <span>Contador global de errores</span>
+      </label>
+      {UIGlobal && (
+        <section ref={options}>
+          <p type="button" className="nes-btn is-error">
+            {contadorErradoGlobal} errores
+          </p>
+        </section>
+      )}
     </>
   );
 }
