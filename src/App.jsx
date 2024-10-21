@@ -9,6 +9,7 @@ function App() {
   const [contadorAcierto, setContadorAcierto] = useState(0);
   const [acierto, setAcierto] = useState(false);
   const [estadoJuego, setEstadoJuego] = useState(true);
+  const [juegoTerminado, setJuegoTerminado] = useState(false);
   const inputRef = useRef(null);
   const modalRef = useRef(null);
   const imgPokeRef = useRef(null);
@@ -19,10 +20,23 @@ function App() {
     try {
       const pokemonAleatorio = await api.random();
       setPokemon(pokemonAleatorio);
+      console.log(pokemonAleatorio.name);
     } catch (error) {
       console.error("Error al obtener el Pokémon:", error);
     }
   }, []);
+
+  useEffect(() => {
+    if (contadorAcierto >= 10) {
+      console.log("Has ganau");
+    }
+    if (contadorErrado >= 10) {
+      console.log("has perdio");
+    }
+    setJuegoTerminado(false);
+    setContadorAcierto(0);
+    setContadorErrado(0);
+  }, [juegoTerminado]);
 
   useEffect(() => {
     obtenerPokemonAleatorio();
@@ -36,17 +50,21 @@ function App() {
 
   const verificarRespuesta = useCallback(() => {
     if (inputNamePokemon === name) {
+      setContadorAcierto((prev) => prev + 1);
       setEstadoJuego(false);
       setAcierto(true);
-      setContadorAcierto((prev) => prev + 1);
     } else {
-      setAcierto(false);
       setContadorErrado((prev) => prev + 1);
+      setAcierto(false);
     }
     if (inputRef.current) {
       inputRef.current.className = `nes-input ${inputNamePokemon === name ? "is-success" : "is-error"}`;
     }
-  }, [inputNamePokemon, name]);
+
+    setJuegoTerminado(
+      (prevJuegoTerminado) => prevJuegoTerminado || contadorAcierto + 1 === 10 || contadorErrado + 1 === 10
+    );
+  }, [inputNamePokemon, name, contadorAcierto, contadorErrado]);
 
   const apretarTecla = useCallback(
     (event) => {
