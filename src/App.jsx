@@ -18,6 +18,7 @@ function App() {
   const inputRef = useRef(null);
   const modalRef = useRef(null);
   const imgPokeRef = useRef(null);
+  const buttonHiddenRef = useRef(null);
   const buttonAdivinar = useRef(null);
   const options = useRef(null);
   const { name } = pokemon;
@@ -61,6 +62,7 @@ function App() {
         return newCount;
       });
       setAcierto(false);
+      buttonHiddenRef.current.hidden = false;
     }
     if (inputRef.current) {
       inputRef.current.className = `nes-input ${inputNamePokemon === name ? "is-success" : "is-error"}`;
@@ -90,6 +92,7 @@ function App() {
         inputRef.current.className = "nes-input";
       }
       setInputNamePokemon("");
+      buttonHiddenRef.current.hidden = true;
     }
   }, [acierto, obtenerPokemonAleatorio]);
 
@@ -119,7 +122,7 @@ function App() {
             }}
           />
         </div>
-        <div ref={buttonAdivinar}>
+        <div ref={buttonAdivinar} className="button">
           <button
             type="button"
             className={estadoJuego ? "nes-btn is-primary" : "nes-btn is-success"}
@@ -128,6 +131,20 @@ function App() {
             }}
           >
             {estadoJuego ? "Adivinar" : "Continuar"}
+          </button>
+          <button
+            ref={buttonHiddenRef}
+            type="button"
+            className="nes-btn is-warning"
+            hidden
+            onClick={() => {
+              obtenerPokemonAleatorio();
+              inputRef.current.value = "";
+              inputRef.current.className = "nes-input";
+              buttonHiddenRef.current.hidden = true;
+            }}
+          >
+            Skipear
           </button>
           <dialog className="nes-dialog" id="dialog-default" ref={modalRef}>
             <form method="dialog">
@@ -153,30 +170,34 @@ function App() {
           </dialog>
         </div>
       </section>
-      <div className="nes-container is-centered">
-        <h2 className="aciertos">Aciertos: {contadorAcierto}</h2>
-        <progress className="nes-progress is-success" value={contadorAcierto} max="10"></progress>
-        <h2 className="fallos">Fallos: {contadorErrado}</h2>
-        <progress className="nes-progress is-error" value={contadorErrado} max="10"></progress>
+      <div className="contador-errores">
+        <div className="nes-container is-centered">
+          <h2 className="aciertos">Aciertos: {contadorAcierto}</h2>
+          <progress className="nes-progress is-success" value={contadorAcierto} max="10"></progress>
+          <h2 className="fallos">Fallos: {contadorErrado}</h2>
+          <progress className="nes-progress is-error" value={contadorErrado} max="10"></progress>
+        </div>
+        <div className="caja-errores">
+          <label>
+            <input
+              type="checkbox"
+              className="nes-checkbox"
+              checked={UIGlobal}
+              onChange={(e) => {
+                setUIGlobal(e.target.checked);
+              }}
+            />
+            <span>Contador global de errores</span>
+          </label>
+          {UIGlobal && (
+            <section ref={options}>
+              <p type="button" className="nes-btn is-error">
+                {contadorErradoGlobal} errores
+              </p>
+            </section>
+          )}
+        </div>
       </div>
-      <label>
-        <input
-          type="checkbox"
-          className="nes-checkbox"
-          checked={UIGlobal}
-          onChange={(e) => {
-            setUIGlobal(e.target.checked);
-          }}
-        />
-        <span>Contador global de errores</span>
-      </label>
-      {UIGlobal && (
-        <section ref={options}>
-          <p type="button" className="nes-btn is-error">
-            {contadorErradoGlobal} errores
-          </p>
-        </section>
-      )}
     </>
   );
 }
