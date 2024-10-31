@@ -1,10 +1,21 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
 #root {
   margin: 0;
+  width: 100vw;
+  height: 100vh;
   padding: 1rem;
   text-align: center;
+}
+
+.todo {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
 .caja-pokemon {
@@ -46,6 +57,7 @@
 
 .nes-progress {
   width: 280px;
+  height: 40px;
 }
 
 .nes-btn {
@@ -55,19 +67,21 @@
 .caja-input {
   display: flex;
   width: 90%;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 10px 0;
 }
 
 .nes-field {
-  width: 700px;
+  width: 720px;
   margin-right: 20px;
 }
 
 .button {
   width: 450px;
   display: flex;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .contador-errores {
@@ -85,4 +99,18 @@
   width: 60%;
   height: 70px;
   gap: 20px;
+}
+
+h2 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.nes-dialog {
+  position: fixed;
+  width: 400px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
 }

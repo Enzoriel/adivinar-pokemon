@@ -98,106 +98,108 @@ function App() {
 
   return (
     <>
-      <div>
-        <h1 className="nes-text is-primary">¿Quién es este Pokémon?</h1>
-      </div>
-      <section className="caja-pokemon">
-        <div className="contenedor-pokemon">
-          <img ref={imgPokeRef} className="img-pokemon-silueta" src={pokemon.image} alt="" />
+      <div className="todo">
+        <div>
+          <h1 className="nes-text is-primary">¿Quién es este Pokémon?</h1>
         </div>
-      </section>
-      <section className="caja-input">
-        <div className="nes-field" id="field">
-          <label htmlFor="name_field"></label>
-          <input
-            type="text"
-            id="name_field"
-            ref={inputRef}
-            className="nes-input"
-            placeholder="Ingresa el nombre del Pókemon"
-            onKeyDown={apretarTecla}
-            onChange={(data) => {
-              setInputNamePokemon(data.target.value.toLocaleLowerCase().replace(/\s+/g, ""));
-              inputRef.current.className = "nes-input";
-            }}
-          />
-        </div>
-        <div ref={buttonAdivinar} className="button">
-          <button
-            type="button"
-            className={estadoJuego ? "nes-btn is-primary" : "nes-btn is-success"}
-            onClick={() => {
-              estadoJuego ? verificarRespuesta() : cambiarPokemon();
-            }}
-          >
-            {estadoJuego ? "Adivinar" : "Continuar"}
-          </button>
-          <button
-            ref={buttonHiddenRef}
-            type="button"
-            className="nes-btn is-warning"
-            hidden
-            onClick={() => {
-              obtenerPokemonAleatorio();
-              inputRef.current.value = "";
-              inputRef.current.className = "nes-input";
-              buttonHiddenRef.current.hidden = true;
-            }}
-          >
-            Skipear
-          </button>
-          <dialog className="nes-dialog" id="dialog-default" ref={modalRef}>
-            <form method="dialog">
-              <p>
-                {contadorAcierto >= 10 && "¡Has ganado!"}
-                {contadorErrado >= 10 && "¡Has perdido!"}
-              </p>
-              <menu className="dialog-menu">
-                <button
-                  className="nes-btn"
-                  onClick={() => {
-                    setJuegoTerminado(false);
-                    setContadorAcierto(0);
-                    setContadorErrado(0);
-                    obtenerPokemonAleatorio();
-                  }}
-                >
-                  {contadorAcierto >= 10 && "Volver a jugar"}
-                  {contadorErrado >= 10 && "Volver a intentarlo"}
-                </button>
-              </menu>
-            </form>
-          </dialog>
-        </div>
-      </section>
-      <div className="contador-errores">
-        <div className="nes-container is-centered">
-          <h2 className="aciertos">Aciertos: {contadorAcierto}</h2>
-          <progress className="nes-progress is-success" value={contadorAcierto} max="10"></progress>
-          <h2 className="fallos">Fallos: {contadorErrado}</h2>
-          <progress className="nes-progress is-error" value={contadorErrado} max="10"></progress>
-        </div>
-        <div className="caja-errores">
-          <label>
+        <section className="caja-pokemon">
+          <div className="contenedor-pokemon">
+            <img ref={imgPokeRef} className="img-pokemon-silueta" src={pokemon.image} alt="" />
+          </div>
+        </section>
+        <section className="caja-input">
+          <div className="nes-field" id="field">
+            <label htmlFor="name_field"></label>
             <input
-              type="checkbox"
-              className="nes-checkbox"
-              checked={UIGlobal}
-              onChange={(e) => {
-                setUIGlobal(e.target.checked);
+              type="text"
+              id="name_field"
+              ref={inputRef}
+              className="nes-input"
+              placeholder="Nombre del Pókemon"
+              onKeyDown={apretarTecla}
+              onChange={(data) => {
+                setInputNamePokemon(data.target.value.toLocaleLowerCase().replace(/\s+/g, ""));
+                inputRef.current.className = "nes-input";
               }}
             />
-            <span>Contador global de errores</span>
-          </label>
-          {UIGlobal && (
-            <section ref={options}>
-              <p type="button" className="nes-btn is-error">
-                {contadorErradoGlobal} errores
-              </p>
-            </section>
-          )}
+          </div>
+          <div ref={buttonAdivinar} className="button">
+            <button
+              type="button"
+              className={estadoJuego ? "nes-btn is-primary" : "nes-btn is-success"}
+              onClick={() => {
+                estadoJuego ? verificarRespuesta() : cambiarPokemon();
+              }}
+            >
+              {estadoJuego ? "Adivinar" : "Continuar"}
+            </button>
+            <button
+              ref={buttonHiddenRef}
+              type="button"
+              className="nes-btn is-warning"
+              hidden
+              onClick={() => {
+                obtenerPokemonAleatorio();
+                inputRef.current.value = "";
+                inputRef.current.className = "nes-input";
+                buttonHiddenRef.current.hidden = true;
+              }}
+            >
+              Skipear
+            </button>
+          </div>
+        </section>
+        <div className="contador-errores">
+          <div className="nes-container is-centered">
+            <h2 className="aciertos">Aciertos: {contadorAcierto}</h2>
+            <progress className="nes-progress is-success" value={contadorAcierto} max="10"></progress>
+            <h2 className="fallos">Fallos: {contadorErrado}</h2>
+            <progress className="nes-progress is-error" value={contadorErrado} max="10"></progress>
+          </div>
+          <div className="caja-errores">
+            <label>
+              <input
+                type="checkbox"
+                className="nes-checkbox"
+                checked={UIGlobal}
+                onChange={(e) => {
+                  setUIGlobal(e.target.checked);
+                }}
+              />
+              <span>Contador global de errores</span>
+            </label>
+            {UIGlobal && (
+              <section ref={options}>
+                <p type="button" className="nes-btn is-error">
+                  {contadorErradoGlobal} errores
+                </p>
+              </section>
+            )}
+          </div>
         </div>
       </div>
+      <dialog className="nes-dialog" id="dialog-default" ref={modalRef}>
+        <form method="dialog">
+          <p>
+            {contadorAcierto >= 10 && "¡Has ganado!"}
+            {contadorErrado >= 10 && "¡Has perdido!"}
+          </p>
+          <menu className="dialog-menu">
+            <button
+              className="nes-btn"
+              onClick={() => {
+                setJuegoTerminado(false);
+                setContadorAcierto(0);
+                setContadorErrado(0);
+                obtenerPokemonAleatorio();
+              }}
+            >
+              {contadorAcierto >= 10 && "Volver a jugar"}
+              {contadorErrado >= 10 && "Volver a intentarlo"}
+            </button>
+          </menu>
+        </form>
+      </dialog>
     </>
   );
 }
