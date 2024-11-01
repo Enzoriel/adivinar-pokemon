@@ -10,7 +10,7 @@ function App() {
   const [acierto, setAcierto] = useState(false);
   const [estadoJuego, setEstadoJuego] = useState(true);
   const [juegoTerminado, setJuegoTerminado] = useState(false);
-  const [UIGlobal, setUIGlobal] = useState(false);
+  const [UIGlobal, setUIGlobal] = useState(true);
   const [contadorErradoGlobal, setContadorErradoGlobal] = useState(() => {
     const savedCount = localStorage.getItem("contadorErradoGlobal");
     return savedCount ? parseInt(savedCount, 10) : 0;
@@ -21,6 +21,7 @@ function App() {
   const buttonHiddenRef = useRef(null);
   const buttonAdivinar = useRef(null);
   const options = useRef(null);
+  const namePokeRef = useRef(null);
   const { name } = pokemon;
 
   const obtenerPokemonAleatorio = useCallback(async () => {
@@ -106,6 +107,9 @@ function App() {
           <div className="contenedor-pokemon">
             <img ref={imgPokeRef} className="img-pokemon-silueta" src={pokemon.image} alt="" />
           </div>
+          <p ref={namePokeRef} className="name-pokemon" hidden>
+            {pokemon.name}
+          </p>
         </section>
         <section className="caja-input">
           <div className="nes-field" id="field">
@@ -139,10 +143,16 @@ function App() {
               className="nes-btn is-warning"
               hidden
               onClick={() => {
-                obtenerPokemonAleatorio();
-                inputRef.current.value = "";
-                inputRef.current.className = "nes-input";
-                buttonHiddenRef.current.hidden = true;
+                setEstadoJuego(false);
+                namePokeRef.current.hidden = false;
+                setTimeout(() => {
+                  obtenerPokemonAleatorio();
+                  inputRef.current.value = "";
+                  inputRef.current.className = "nes-input";
+                  buttonHiddenRef.current.hidden = true;
+                  setEstadoJuego(true);
+                  namePokeRef.current.hidden = true;
+                }, 2000);
               }}
             >
               Skipear
@@ -150,7 +160,7 @@ function App() {
           </div>
         </section>
         <div className="contador-errores">
-          <div className="nes-container is-centered">
+          <div className="progress">
             <h2 className="aciertos">Aciertos: {contadorAcierto}</h2>
             <progress className="nes-progress is-success" value={contadorAcierto} max="10"></progress>
             <h2 className="fallos">Fallos: {contadorErrado}</h2>
